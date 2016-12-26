@@ -1,9 +1,9 @@
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="bower_components/polymerfire/firebase-query.html">
-<link rel="import" href="bower_components/paper-button/paper-button.html">
-<link rel="import" href="bower_components/paper-card/paper-card.html">
+<!-- <link rel="import" href="bower_components/polymerfire/firebase-query.html"> -->
+<!-- <link rel="import" href="bower_components/paper-button/paper-button.html"> -->
+<!-- <link rel="import" href="bower_components/paper-card/paper-card.html"> -->
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
-<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<!-- <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html"> -->
 
 <dom-module id="hromada-login">
 <template>
@@ -55,13 +55,13 @@
   }
 </style>
 <firebase-auth
-  id="email" user="{{user}}" status-known="{{statusKnown}}">
+  id="emailauth" user="{{user}}" status-known="{{statusKnown}}">
 </firebase-auth>
-<firebase-query
+<!-- <firebase-query
   id="queryUser"
   path="/users"
   data={{users}}>
-</firebase-query>
+</firebase-query> -->
 <div class="loginContainer centered" hidden$="[[user]]">
   <div class="intro">
     <p>Ласкаво просимо в <span style="font-size: 20px;">Рупорі Громади</span></p>
@@ -102,27 +102,27 @@ Polymer({
   ready: function() {
     console.log("ready");
   },
-  loginGoogle: function() {
-    return this.$.authGoogle.signInWithPopup();
-  },
-  loginTwitter: function() {
-    return this.$.authTwitter.signInWithPopup();
-  },
-  logout: function() {
-    this.userDB();
-    return this.$.authGoogle.signOut();
-  },
-  userDB: function() {
-    let usr = this.user;
-    let q = this.$.queryUser.ref.child(usr.uid);
-    q.once("value", function(snapshot){
-      if(!snapshot.exists()){
-        q.set({uid: usr.uid, type: "user", name: usr.displayName})
-      }
-    }, function(errorObject) {
-      console.log("The read failed: "+errorObject.code);
-    });
-  }
+  // loginGoogle: function() {
+  //   return this.$.authGoogle.signInWithPopup();
+  // },
+  // loginTwitter: function() {
+  //   return this.$.authTwitter.signInWithPopup();
+  // },
+  // logout: function() {
+  //   this.userDB();
+  //   return this.$.authGoogle.signOut();
+  // },
+  // userDB: function() {
+  //   let usr = this.user;
+  //   let q = this.$.queryUser.ref.child(usr.uid);
+  //   q.once("value", function(snapshot){
+  //     if(!snapshot.exists()){
+  //       q.set({uid: usr.uid, type: "user", name: usr.displayName})
+  //     }
+  //   }, function(errorObject) {
+  //     console.log("The read failed: "+errorObject.code);
+  //   });
+  // }
 });
 </script>
 </dom-module>

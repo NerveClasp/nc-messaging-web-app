@@ -1,6 +1,6 @@
 <link rel="import" href="hromada-login.html">
-<link rel="import" href="hromada-rupor.html">
-<link rel="import" href="hromada-list.html">
+<!-- <link rel="import" href="hromada-rupor.html"> -->
+<!-- <link rel="import" href="hromada-list.html"> -->
 <link rel="import" href="bower_components/polymerfire/firebase-app.html">
 
 <dom-module id="hromada-app">
@@ -23,15 +23,15 @@
     </style>
   <firebase-app
     id="firebase"
-    auth-domain="hromada-messaging.firebaseapp.com"
-    database-url="https://hromada-messaging.firebaseio.com/"
-    api-key="AIzaSyClOjYeJI1kv0Z8Ez-j8iWwK8y_SwyKcMk">
+    auth-domain="nc-messaging-web-app.firebaseapp.com"
+    database-url="https://nc-messaging-web-app.firebaseio.com/"
+    api-key="AIzaSyAWVXkrT55j0P8cdOR2wOZfrVa1hWWw2-w">
   </firebase-app>
   <firebase-auth user="{{user}}"></firebase-auth>
   <hromada-login></hromada-login>
     <template is="dom-if" if="[[user]]">
-      <hromada-rupor></hromada-rupor>
-      <hromada-list></hromada-list>
+      <!-- <hromada-rupor></hromada-rupor> -->
+      <!-- <hromada-list></hromada-list> -->
     </template>
 </template>
   <script>
