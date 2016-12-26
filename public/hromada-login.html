@@ -1,6 +1,7 @@
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
 <!-- <link rel="import" href="bower_components/polymerfire/firebase-query.html"> -->
-<!-- <link rel="import" href="bower_components/paper-button/paper-button.html"> -->
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
 <!-- <link rel="import" href="bower_components/paper-card/paper-card.html"> -->
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
 <!-- <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html"> -->
@@ -19,7 +20,7 @@
   }
   .loginContainer{
     height: 280px;
-    width: 280px;
+    width: 400px;
   }
   .wrapper{
     margin: 0;
@@ -55,7 +56,7 @@
   }
 </style>
 <firebase-auth
-  id="emailauth" user="{{user}}" status-known="{{statusKnown}}">
+  id="auth" user="{{user}}" status-known="{{statusKnown}}">
 </firebase-auth>
 <!-- <firebase-query
   id="queryUser"
@@ -65,9 +66,17 @@
 <div class="loginContainer centered" hidden$="[[user]]">
   <div class="intro">
     <p>Ласкаво просимо в <span style="font-size: 20px;">Рупорі Громади</span></p>
-    <p>Маєте аккаунт - заходьте. Ще нема? Сміливо створіть!</p>
-  </div>
+    <p>Залогіньтесь чи створіть аккаунт.</p>
+    <div class="loginform">
+      <paper-input id="email" label="Імейл"></paper-input>
+      <paper-input id="password" label="Пароль"></paper-input>
 
+      <paper-button raised on-tap="login">Зайти</paper-button>
+      <paper-button raised on-tap="signup">Зареєструватись</paper-button>
+
+
+    </div>
+  </div>
 </div>
 <div class="wrapper, layout horizontal" hidden$="[[!user]]">
   <div id="test" onload="userCheck([[user]])" onshow="userCheck([[user]])"></div>
@@ -77,7 +86,7 @@
       <template is="dom-if" if="[[user]]">
 
         <div class="welcome">
-          <paper-button raised on-tap="logout" id="logout">Leave</paper-button>
+          <paper-button raised on-tap="logout" id="logout">Вийти</paper-button>
           <h3>[[user.displayName]], ласкаво просимо до Рупору Громади</h3>
         </div>
       </template></div>
@@ -108,10 +117,22 @@ Polymer({
   // loginTwitter: function() {
   //   return this.$.authTwitter.signInWithPopup();
   // },
-  // logout: function() {
-  //   this.userDB();
-  //   return this.$.authGoogle.signOut();
-  // },
+  login: function(){
+
+  },
+  signup: function() {
+    var email = this.$.email.value;
+    var password = this.$.password.value;
+    return this.$.auth.createUserWithEmailAndPassword(email, password)
+      .catch(function(error) {
+        console.log("Oh snap!", error.code, error.message);
+        console.log("Tried to create account using", email);
+      });
+  },
+  logout: function() {
+    this.userDB();
+    return this.$.authGoogle.signOut();
+  },
   // userDB: function() {
   //   let usr = this.user;
   //   let q = this.$.queryUser.ref.child(usr.uid);
