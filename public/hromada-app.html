@@ -1,0 +1,50 @@
+<link rel="import" href="hromada-login.html">
+<link rel="import" href="hromada-rupor.html">
+<link rel="import" href="hromada-list.html">
+<link rel="import" href="bower_components/polymerfire/firebase-app.html">
+
+<dom-module id="hromada-app">
+  <template>
+    <style>
+      h1{
+        display: block;
+        font-family: Junegull, monospace;
+        text-align: center;
+        border: 10px;
+        border-width: 0px;
+        border-radius: 2px;
+        background-color: #609bd1;
+        color: #3d3d3d;
+        flex-direction: row;
+        padding: 12px;
+        margin: 0;
+      }
+
+    </style>
+  <firebase-app
+    id="firebase"
+    auth-domain="hromada-messaging.firebaseapp.com"
+    database-url="https://hromada-messaging.firebaseio.com/"
+    api-key="AIzaSyClOjYeJI1kv0Z8Ez-j8iWwK8y_SwyKcMk">
+  </firebase-app>
+  <firebase-auth user="{{user}}"></firebase-auth>
+  <hromada-login></hromada-login>
+    <template is="dom-if" if="[[user]]">
+      <hromada-rupor></hromada-rupor>
+      <hromada-list></hromada-list>
+    </template>
+</template>
+  <script>
+    Polymer({
+      is: 'hromada-app',
+      properties: {
+        user: {
+          type: Object
+        },
+        statusKnown: {
+          type: Object
+        }
+      }
+    });
+  </script>
+</dom-module>

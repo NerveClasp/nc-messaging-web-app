@@ -1,0 +1,128 @@
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="stylesheet" href="style.css" media="screen" title="no title">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="hromada-login">
+<template>
+<style>
+  .welcome-home{
+    font-family: Junegull, monospace;
+    border-radius: 50%;
+    height: 128px;
+    width: 128px;
+    color: #3d3d3d;
+    background-color: #609bd1;
+    box-shadow:
+  }
+  .loginContainer{
+    height: 280px;
+    width: 280px;
+  }
+  .wrapper{
+    margin: 0;
+    border: 10px;
+    border-width: 0px;
+    border-radius: 2px;
+    background-color: #609bd1;
+    color: #3d3d3d;
+    padding: 12px;
+    margin: 6px;
+    align-items: center;
+  }
+  .welcome{
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    text-align: center;
+    padding-left: 6px;
+  }
+  .pcard{
+    width: 100%;
+    background-color: #609bd1;
+    font-family: Junegull, monospace;
+  }
+  #logout{
+    float: left;
+  }
+  .intro{
+    font-family: Junegull, monospace;
+    color: #609bd1;
+    text-align: center;
+    text-shadow: 0 0 2px #609bd1;
+  }
+</style>
+<firebase-auth
+  id="email" user="{{user}}" status-known="{{statusKnown}}">
+</firebase-auth>
+<firebase-query
+  id="queryUser"
+  path="/users"
+  data={{users}}>
+</firebase-query>
+<div class="loginContainer centered" hidden$="[[user]]">
+  <div class="intro">
+    <p>Ласкаво просимо в <span style="font-size: 20px;">Рупорі Громади</span></p>
+    <p>Маєте аккаунт - заходьте. Ще нема? Сміливо створіть!</p>
+  </div>
+
+</div>
+<div class="wrapper, layout horizontal" hidden$="[[!user]]">
+  <div id="test" onload="userCheck([[user]])" onshow="userCheck([[user]])"></div>
+  <paper-card class="pcard">
+    <div class="card-content">
+
+      <template is="dom-if" if="[[user]]">
+
+        <div class="welcome">
+          <paper-button raised on-tap="logout" id="logout">Leave</paper-button>
+          <h3>[[user.displayName]], ласкаво просимо до Рупору Громади</h3>
+        </div>
+      </template></div>
+    </paper-card>
+  </div>
+
+</template>
+<script>
+Polymer({
+  is: 'hromada-login',
+  properties: {
+    user: {
+      type: Object
+    },
+    statusKnown: {
+      type: Object
+    },
+    users: {
+      type: Object
+    }
+  },
+  ready: function() {
+    console.log("ready");
+  },
+  loginGoogle: function() {
+    return this.$.authGoogle.signInWithPopup();
+  },
+  loginTwitter: function() {
+    return this.$.authTwitter.signInWithPopup();
+  },
+  logout: function() {
+    this.userDB();
+    return this.$.authGoogle.signOut();
+  },
+  userDB: function() {
+    let usr = this.user;
+    let q = this.$.queryUser.ref.child(usr.uid);
+    q.once("value", function(snapshot){
+      if(!snapshot.exists()){
+        q.set({uid: usr.uid, type: "user", name: usr.displayName})
+      }
+    }, function(errorObject) {
+      console.log("The read failed: "+errorObject.code);
+    });
+  }
+});
+</script>
+</dom-module>
