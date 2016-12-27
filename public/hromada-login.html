@@ -1,12 +1,18 @@
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
-<!-- <link rel="import" href="bower_components/polymerfire/firebase-query.html"> -->
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="bower_components/polymerfire/firebase-document.html">
+
 <!-- <link rel="import" href="bower_components/paper-card/paper-card.html"> -->
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
 <!-- <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html"> -->
 
-<dom-module id="hromada-login">
+<dom-module id="hromada-login" is="dom-bind">
 <template>
 <style>
   .welcome-home{
@@ -58,24 +64,45 @@
 <firebase-auth
   id="auth" user="{{user}}" status-known="{{statusKnown}}">
 </firebase-auth>
-<!-- <firebase-query
-  id="queryUser"
+<firebase-query
+  id="userdb"
   path="/users"
-  data={{users}}>
-</firebase-query> -->
+  data={{userdata}}>
+</firebase-query>
+<firebase-document
+  id="usr"
+  path="/users/[[user.uid]]"
+  data="{{usr}}">
+</firebase-document>
 <div class="loginContainer centered" hidden$="[[user]]">
   <div class="intro">
     <p>Ласкаво просимо в <span style="font-size: 20px;">Рупорі Громади</span></p>
     <p>Залогіньтесь чи створіть аккаунт.</p>
-    <div class="loginform">
-      <paper-input id="email" label="Імейл"></paper-input>
-      <paper-input id="password" label="Пароль"></paper-input>
-
-      <paper-button raised on-tap="login">Зайти</paper-button>
-      <paper-button raised on-tap="signup">Зареєструватись</paper-button>
-
-
-    </div>
+    <paper-tabs selected={{selected}}>
+      <paper-tab>Ввійти</paper-tab>
+      <paper-tab>Зареєструватись</paper-tab>
+    </paper-tabs>
+    <iron-pages selected={{selected}}>
+      <div>
+        <paper-input id="emailL" label="Імейл"></paper-input>
+        <paper-input id="passwordL" label="Пароль"></paper-input>
+        <paper-button raised on-tap="login">Зайти</paper-button>
+      </div>
+      <div>
+        <paper-input id="emailS" label="Імейл"></paper-input>
+        <paper-input id="passwordS" label="Пароль"></paper-input>
+        <paper-input id="name" label="Ім'я"></paper-input>
+        <!-- <paper-dropdown-menu label="Громада" selected={{value}}>
+          <paper-listbox class="dropdown-content">
+            <paper-item selected="0">Львів</paper-item>
+            <paper-item selected="1">Луцьк</paper-item>
+            <paper-item selected="2">Білогір'я</paper-item>
+            <paper-item selected="3">Київ</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu> -->
+        <paper-button raised on-tap="signup">Зареєструватись</paper-button>
+      </div>
+    </iron-pages>
   </div>
 </div>
 <div class="wrapper, layout horizontal" hidden$="[[!user]]">
@@ -87,7 +114,7 @@
 
         <div class="welcome">
           <paper-button raised on-tap="logout" id="logout">Вийти</paper-button>
-          <h3>[[user.displayName]], ласкаво просимо до Рупору Громади</h3>
+          <h3>[[usr.name]], ласкаво просимо до Рупору Громади</h3>
         </div>
       </template></div>
     </paper-card>
@@ -104,46 +131,53 @@ Polymer({
     statusKnown: {
       type: Object
     },
-    users: {
+    userdata: {
       type: Object
+    },
+    selected:{
+      type: Number,
+      value: 0
     }
   },
   ready: function() {
     console.log("ready");
   },
-  // loginGoogle: function() {
-  //   return this.$.authGoogle.signInWithPopup();
-  // },
-  // loginTwitter: function() {
-  //   return this.$.authTwitter.signInWithPopup();
-  // },
   login: function(){
-
+    let email = this.$.emailL.value;
+    let password = this.$.passwordL.value;
+    this.$.auth.signInWithEmailAndPassword(email, password)
+      .catch(function(err) {
+        console.log("Oops, login error:", err.code, err.message);
+      })
   },
   signup: function() {
-    var email = this.$.email.value;
-    var password = this.$.password.value;
+    let email = this.$.emailS.value;
+    let password = this.$.passwordS.value;
+    let name = this.$.name.value;
+    const ref = this.$.userdb.ref;
     return this.$.auth.createUserWithEmailAndPassword(email, password)
+      .then(function(resp) {
+        let userDetails = {
+          email: resp.email,
+          emailVerified: resp.emailVerified,
+          name: name,
+          uid: resp.uid,
+          location: "Львів"
+        }
+        ref.child(resp.uid).set(userDetails);
+        console.log("Successfully added", resp.email, resp.uid);
+      })
       .catch(function(error) {
         console.log("Oh snap!", error.code, error.message);
         console.log("Tried to create account using", email);
+        //TODO error message under proper input field
+        console.log(error);
       });
+
   },
   logout: function() {
-    this.userDB();
-    return this.$.authGoogle.signOut();
-  },
-  // userDB: function() {
-  //   let usr = this.user;
-  //   let q = this.$.queryUser.ref.child(usr.uid);
-  //   q.once("value", function(snapshot){
-  //     if(!snapshot.exists()){
-  //       q.set({uid: usr.uid, type: "user", name: usr.displayName})
-  //     }
-  //   }, function(errorObject) {
-  //     console.log("The read failed: "+errorObject.code);
-  //   });
-  // }
+    return this.$.auth.signOut();
+  }
 });
 </script>
 </dom-module>

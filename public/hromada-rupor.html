@@ -1,0 +1,113 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+
+<link rel="stylesheet" href="style.css" media="screen" title="no title">
+
+<dom-module id="hromada-rupor">
+
+  <style is="custom-style" include="iron-flex">
+  .container {
+    @apply(--layout-horizontal);
+    align-items: baseline;
+  }
+  .addshout{
+    @apply(--layout-flex);
+  }
+  .card-actions{
+    @apply(--layout-vertical);
+    @apply(--layout-flex);
+  }
+  #textarea{
+    --paper-input-container-focus-color: #609bd1;
+    width: 100%;
+  }
+  #button-container{
+    align-self: flex-end;
+    padding-left: 6px;
+    padding-bottom: 21px;
+  }
+  </style>
+<template>
+  <firebase-auth id="usr" user="{{user}}"></firebase-auth>
+  <firebase-document
+    id="userdata"
+    path="/users/[[user.uid]]"
+    data="{{userdata}}">
+  </firebase-document>
+  <firebase-query
+    id="shout"
+    path="/shout/[[userdata.location]]"
+    data={{shouts}}>
+  </firebase-query>
+  <div id="card">
+    <div id="shouts" class="layout vertical">
+      <div class="list-container layout vertical">
+        <paper-card id="add" class="addshout">
+          <div class="card-content">
+            <div class="container, layout horizontal">
+              <paper-textarea
+              id="textarea"
+              usrdata=[[userdata]]
+              textinput={{textinput}}
+              onclick="this.clicked"
+              label="Тримай рупор!"
+              class="shout-text"
+              char-counter>
+            </paper-textarea>
+            <div id="button-container" checklen={{textinput::change}}>
+            <paper-button raised class="button" id="add-button"  on-tap="add">Додати</paper-button>
+            </div>
+          </div>
+        </div>
+      </paper-card>
+    </div>
+   </div>
+  </div>
+
+</template>
+<script>
+Polymer({
+  is: 'hromada-rupor',
+  properties: {
+    shouts: {
+      type: Object
+    },
+    user:{
+      type: Object,
+    },
+    userdata:{
+      type: Object
+    }
+  },
+  clicked: function(){
+    this.$.textarea.label = "Ідеальний Час, щоб...";
+  },
+  add: function() {
+    let usr = this.userdata;
+    let obj = "";
+    obj = {
+      text: this.$.textarea.value,
+      author: usr.name,
+      authorEmail: usr.email,
+      author_uid: this.user.uid,
+      order: 0-Date.now()
+    };
+    if (this.$.textarea.value == null) {
+      this.$.textarea.label = "Спершу треба щось написати :)";
+    }else if(this.$.textarea.value.length < 5){
+      this.$.textarea.label = "А можна щось довшечке?..";
+    }else{
+      this.$.textarea.label = "Дяки ;) Громада тебе почула!";
+      this.$.shout.ref.push(obj);
+      this.$.textarea.value = null;
+    }
+  }
+});
+</script>
+</dom-module>

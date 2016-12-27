@@ -11,7 +11,7 @@
 .text{
   @apply(--layout-flex);
 }
-.tweet-text{
+.shout-text{
   display:block;
   vertical-align: middle;
   padding: 5px 0 0 16px;
