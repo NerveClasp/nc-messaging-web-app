@@ -1,0 +1,60 @@
+<dom-module id="hromada-settings" is="dom-bind">
+
+<style is="custom-style" include="iron-flex">
+.container {
+  @apply(--layout-horizontal);
+  align-items: baseline;
+}
+.addshout{
+  @apply(--layout-flex);
+}
+.card-actions{
+  @apply(--layout-vertical);
+  @apply(--layout-flex);
+}
+#textarea{
+  --paper-input-container-focus-color: #609bd1;
+  width: 100%;
+}
+#button-container{
+  align-self: flex-end;
+  padding-left: 6px;
+  padding-bottom: 21px;
+}
+</style>
+<template>
+  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-document
+    id="userdata"
+    path="/users/[[user.uid]]"
+    data="{{userdata}}">
+  </firebase-document>
+    <div id="shouts" class="layout vertical">
+      <div class="list-container layout vertical">
+        <paper-card id="add" class="addshout">
+          <div class="card-content">
+            <div class="container, layout horizontal">
+              <paper-textarea
+              id="textarea"
+              usrdata=[[userdata]]
+              textinput={{textinput}}
+              onclick="this.clicked"
+              label="Тримай рупор!"
+              class="shout-text"
+              char-counter>
+            </paper-textarea>
+            <div id="button-container" checklen={{textinput::change}}>
+            <paper-button raised class="button" id="add-button"  on-tap="add">Додати</paper-button>
+            </div>
+          </div>
+        </div>
+      </paper-card>
+    </div>
+   </div>
+</template>
+<script>
+Polymer({
+  is: 'hromada-settings'
+});
+</script>
+</dom-module>

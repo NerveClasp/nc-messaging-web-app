@@ -1,0 +1,159 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="stylesheet" href="style.css" media="screen" title="no title">
+<dom-module id="hromada-list">
+  <style is="custom-style" include="iron-flex">
+  .container {
+    @apply(--layout-horizontal);
+    @apply(--layout-wrap);
+
+  }
+  .list-container{
+    font-size: 10pt;
+    @apply(--layout-horizontal);
+    margin: 3px;
+    width: 100%;
+    align-self: center;
+  }
+  @media only screen and (min-width: 768px) {
+    .list-container{
+      font-size: 14pt;
+      max-width: 768px;
+    }
+  }
+  .text{
+    @apply(--layout-flex);
+  }
+  .pcard{
+    @apply(--layout-flex);
+    /*@apply(--layout-vertical);*/
+    align-items: center;
+  }
+  #name{
+    padding: 0;
+  }
+  .info{
+    @apply(--layout-horizontal);
+    color: #3a5d7e;
+    text-align: left;
+    padding-left: 48px;
+    width: 100%;
+    font-family: OpenGostB, monospace;
+  }
+  .info-details{
+    @apply(--layout-flex);
+    padding-right: 12px;
+    align-self: center;
+  }
+  .card-actions{
+    @apply(--layout-horizontal);
+    @apply(--layout-flex);
+    /*align-items: center;*/
+    background-color: #F2F9FF;
+  }
+  #edit{
+    float: right;
+  }
+  @media only screen and (max-width: 375px) {
+    .info{
+      padding-left: 0;
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+  </style>
+<template>
+  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-document
+    id="userdata"
+    path="/users/[[user.uid]]"
+    data="{{userdata}}">
+  </firebase-document>
+  <firebase-query
+    id="shouts"
+    limit-to-first={{limitToFirst}}
+    order-by-child="order"
+    path="/shout/[[userdata.location]]"
+    data={{shouts}}>
+  </firebase-query>
+
+  <div id="shouts" class="layout vertical">
+    <div class="list-container">
+      <paper-card id="name" class="pcard">
+        <div class="shout-text" id="name"><h1>[[userdata.location]]</h1></div>
+      </paper-card>
+    </div>
+    <template is="dom-repeat" items="[[shouts]]" as="shout">
+      <div class="list-container">
+        <paper-card class="pcard">
+          <div class="card-content">
+            <div class="container, layout horizontal">
+              <div class="shout-text">[[shout.text]]</div>
+            </div>
+          </div>
+          <div class="card-actions" id="userinfo">
+
+            <div class="info">
+              <div class="info-details">
+                Автор: [[shout.author]]
+              </div>
+              <!-- <div class="info-details">
+              Last Edit: [[shout.lastEdit]]
+            </div> -->
+
+          </div>
+          <template is="dom-if" if="[[sameuser]]" restamp="true">
+            <paper-button raised id="edit" key="[[textUpdateInput]]"
+              user=[[user]] on-tap="edit">
+              Edit
+            </paper-button>
+          </template>
+          <template is="dom-if" if="[[userdb.admin]]" restamp="true">
+            <paper-button raised id="approve" key="[[textUpdateInput]]"
+              shout=[[shout]] on-tap="approve" hidden$="[[shout.queued]]">
+              Норм
+            </paper-button>
+          </template>
+      </div>
+    </paper-card>
+
+    <!-- </div> -->
+    <!-- </div> -->
+  </div>
+  </template>
+  <paper-card class="list-container">
+    <div class="card-actions">
+      <paper-button raised class="card-actions" id="load-more" on-tap="loadmore">
+        Показати старіші надходження
+      </paper-button>
+    </div>
+  </paper-card>
+  </div>
+
+
+</template>
+<script>
+Polymer({
+  is: 'hromada-list',
+  properties: {
+    userdata: {
+      type: Object
+    },
+    user:{
+      type: Object
+    },
+    shouts:{
+      type: Object
+    },
+    limitToFirst:{
+      type: Number,
+      value: 10
+    }
+  }
+});
+</script>
+</dom-module>

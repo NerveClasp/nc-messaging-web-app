@@ -1,6 +1,7 @@
 <link rel="import" href="hromada-login.html">
 <link rel="import" href="hromada-rupor.html">
-<!-- <link rel="import" href="hromada-list.html"> -->
+<link rel="import" href="hromada-list.html">
+<link rel="import" href="hromada-settings.html">
 <link rel="import" href="bower_components/polymerfire/firebase-app.html">
 
 <dom-module id="hromada-app">
@@ -30,8 +31,18 @@
   <firebase-auth user="{{user}}"></firebase-auth>
   <hromada-login></hromada-login>
     <template is="dom-if" if="[[user]]">
-      <hromada-rupor></hromada-rupor>
-      <!-- <hromada-list></hromada-list> -->
+      <paper-tabs selected={{selected}}>
+        <paper-tab>Рупор</paper-tab>
+        <paper-tab>Налаштування</paper-tab>
+      </paper-tabs>
+      <iron-pages selected={{selected}}>
+      <div>
+        <hromada-rupor></hromada-rupor>
+        <hromada-list></hromada-list>
+      </div>
+      <div>
+        <hromada-settings></hromada-settings>
+      </div>
     </template>
 </template>
   <script>
@@ -43,6 +54,10 @@
         },
         statusKnown: {
           type: Object
+        },
+        selected:{
+          type: Number,
+          value: 1
         }
       }
     });
