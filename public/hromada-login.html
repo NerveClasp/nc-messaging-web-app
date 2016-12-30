@@ -7,10 +7,7 @@
 <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="bower_components/polymerfire/firebase-document.html">
-
-<!-- <link rel="import" href="bower_components/paper-card/paper-card.html"> -->
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
-<!-- <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html"> -->
 
 <dom-module id="hromada-login" is="dom-bind">
 <template>
@@ -60,6 +57,17 @@
     text-align: center;
     text-shadow: 0 0 2px #609bd1;
   }
+  .textleft{
+    text-align: left;
+  }
+  #errormessage{
+    display: block;
+    background-color: red;
+    color: white;
+    /*height: 36px;*/
+    /*min-height: 36px;*/
+    padding: 12px;
+  }
 </style>
 <firebase-auth
   id="auth" user="{{user}}" status-known="{{statusKnown}}">
@@ -78,20 +86,40 @@
   <div class="intro">
     <p>Ласкаво просимо в <span style="font-size: 20px;">Рупорі Громади</span></p>
     <p>Залогіньтесь чи створіть аккаунт.</p>
+    <div id="errormessage" hidden="true">Щось пішло не так</div>
+    <min-length-validator id="min-length-validator" min-length="6"></min-length-validator>
+    <match-passwords-validator id="match-passwords-validator" password="[[passwordinput]]"></match-passwords-validator>
     <paper-tabs selected={{selected}}>
       <paper-tab>Ввійти</paper-tab>
       <paper-tab>Зареєструватись</paper-tab>
     </paper-tabs>
     <iron-pages selected={{selected}}>
       <div>
-        <paper-input id="emailL" label="Імейл"></paper-input>
-        <paper-input id="passwordL" label="Пароль"></paper-input>
+        <gold-email-input id="emailL" label="Імейл" auto-validate class="textleft"
+          validator="email-validator" required error-message="Не схоже на імейл">
+        </gold-email-input>
+        <paper-password-input
+          id="passwordL" label="Пароль" class="textleft"
+          auto-validate validator="min-length-validator"
+					error-message="Пароль має бути мінімум 6 символів">
+        </paper-password-input>
         <paper-button raised on-tap="login">Зайти</paper-button>
       </div>
       <div>
-        <paper-input id="emailS" label="Імейл"></paper-input>
-        <paper-input id="passwordS" label="Пароль"></paper-input>
-        <paper-input id="name" label="Ім'я"></paper-input>
+        <gold-email-input id="emailS" label="Імейл" auto-validate  class="textleft"
+          validator="email-validator" required error-message="Не схоже на імейл">
+        </gold-email-input>
+        <paper-password-input
+          id="passwordS" value={{passwordinput}} label="Пароль" class="textleft"
+          auto-validate validator="min-length-validator"
+					error-message="Пароль має бути мінімум 6 символів">
+        </paper-password-input>
+        <paper-password-input
+          id="passwordSconf" label="Повторити пароль" class="textleft"
+          auto-validate validator="match-passwords-validator"
+          error-message="Паролі не збігаються">
+        </paper-password-input>
+        <paper-input id="name" required label="Ім'я" class="textleft"></paper-input>
         <!-- <paper-dropdown-menu label="Громада" selected={{value}}>
           <paper-listbox class="dropdown-content">
             <paper-item selected="0">Львів</paper-item>
@@ -114,7 +142,6 @@
 
         <div class="welcome">
           <paper-button raised on-tap="logout" id="logout">Вийти</paper-button>
-          <paper-button raised on-tap="settings" id="logout">Налаштування</paper-button>
           <h3>[[usr.name]], ласкаво просимо до Рупору Громади</h3>
         </div>
       </template></div>
@@ -146,21 +173,25 @@ Polymer({
   login: function(){
     let email = this.$.emailL.value;
     let password = this.$.passwordL.value;
+    let errormessage = this.$.errormessage;
+    let displayError = this.displayError;
     this.$.auth.signInWithEmailAndPassword(email, password)
       .catch(function(err) {
         console.log("Oops, login error:", err.code, err.message);
+        displayError(errormessage, err.code, err.message);
       })
   },
   signup: function() {
     let email = this.$.emailS.value;
     let password = this.$.passwordS.value;
     let name = this.$.name.value;
+    let displayError = this.displayError;
+    let errormessage = this.$.errormessage;
     const ref = this.$.userdb.ref;
     return this.$.auth.createUserWithEmailAndPassword(email, password)
       .then(function(resp) {
         let userDetails = {
           email: resp.email,
-          emailVerified: resp.emailVerified,
           name: name,
           uid: resp.uid,
           location: "Львів"
@@ -168,16 +199,37 @@ Polymer({
         ref.child(resp.uid).set(userDetails);
         console.log("Successfully added", resp.email, resp.uid);
       })
-      .catch(function(error) {
-        console.log("Oh snap!", error.code, error.message);
-        console.log("Tried to create account using", email);
-        //TODO error message under proper input field
-        console.log(error);
+      .catch(function(err) {
+        console.log("signup error!", err.code, err.message);
+        displayError(errormessage, err.code, err.message);
       });
 
   },
   logout: function() {
     return this.$.auth.signOut();
+  },
+  displayError: function(div, code, message) {
+    div.hidden = false;
+    switch (code) {
+      case "auth/user-not-found":
+        message = "Користувача з таким імейлом не знайдено";
+        break;
+      case "auth/invalid-email":
+        message = "Щось не так з імейлом";
+        break;
+      case "auth/wrong-password":
+        message = "Невірний пароль"
+        break;
+      case "auth/email-already-in-use":
+        message = "Аккаунт з таким імейлом вже існує"
+        break;
+      case "auth/weak-password":
+        message = "Пароль повинен бути не менше 8ми символів"
+        break;
+      default:
+        message;
+    }
+    div.innerHTML = message;
   }
 });
 </script>

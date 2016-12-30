@@ -96,33 +96,13 @@
             </div>
           </div>
           <div class="card-actions" id="userinfo">
-
             <div class="info">
               <div class="info-details">
                 Автор: [[shout.author]]
               </div>
-              <!-- <div class="info-details">
-              Last Edit: [[shout.lastEdit]]
-            </div> -->
-
-          </div>
-          <template is="dom-if" if="[[sameuser]]" restamp="true">
-            <paper-button raised id="edit" key="[[textUpdateInput]]"
-              user=[[user]] on-tap="edit">
-              Edit
-            </paper-button>
-          </template>
-          <template is="dom-if" if="[[userdb.admin]]" restamp="true">
-            <paper-button raised id="approve" key="[[textUpdateInput]]"
-              shout=[[shout]] on-tap="approve" hidden$="[[shout.queued]]">
-              Норм
-            </paper-button>
-          </template>
+            </div>
       </div>
     </paper-card>
-
-    <!-- </div> -->
-    <!-- </div> -->
   </div>
   </template>
   <paper-card class="list-container">

@@ -1,9 +1,13 @@
 <dom-module id="hromada-settings" is="dom-bind">
 
 <style is="custom-style" include="iron-flex">
+.card-content{
+  margin-right: 24px;
+}
 .container {
   @apply(--layout-horizontal);
   align-items: baseline;
+  margin-right: 12px;
 }
 .addshout{
   @apply(--layout-flex);
@@ -17,9 +21,7 @@
   width: 100%;
 }
 #button-container{
-  align-self: flex-end;
-  padding-left: 6px;
-  padding-bottom: 21px;
+  align-self: center;
 }
 </style>
 <template>
@@ -29,23 +31,40 @@
     path="/users/[[user.uid]]"
     data="{{userdata}}">
   </firebase-document>
+  <firebase-query
+    id="usr"
+    path="/users"
+    data={{usrs}}>
+  </firebase-query>
     <div id="shouts" class="layout vertical">
       <div class="list-container layout vertical">
         <paper-card id="add" class="addshout">
           <div class="card-content">
-            <div class="container, layout horizontal">
+            <div class="container, layout vertical">
+              <min-length-validator id="min-length-validator" min-length="6"></min-length-validator>
+              <match-passwords-validator id="match-passwords-validator" password="[[passwordinput]]"></match-passwords-validator>
+              <gold-email-input id="email" label="Імейл" auto-validate
+              class="shout-text" value=[[userdata.email]]
+              validator="email-validator" error-message="Не схоже на імейл"></gold-email-input>
               <paper-textarea
-              id="textarea"
-              usrdata=[[userdata]]
-              textinput={{textinput}}
-              onclick="this.clicked"
-              label="Тримай рупор!"
-              class="shout-text"
-              char-counter>
-            </paper-textarea>
-            <div id="button-container" checklen={{textinput::change}}>
-            <paper-button raised class="button" id="add-button"  on-tap="add">Додати</paper-button>
-            </div>
+              id="name" textinput={{textinput}} label="Ім'я"
+              class="shout-text" value=[[userdata.name]]>
+              </paper-textarea>
+              <paper-password-input
+              id="password" value={{passwordinput}} label="Новий пароль (залиш пустим якщо не бажаєш змінювати)"
+              class="shout-text" auto-validate validator="min-length-validator"
+    					error-message="Пароль має бути мінімум 6 символів">
+              </paper-password-input>
+              <paper-password-input
+              id="passwordconf" label="Повторити пароль" class="shout-text"
+              auto-validate validator="match-passwords-validator"
+    					error-message="Паролі не збігаються">
+              </paper-password-input>
+          </div>
+        </div>
+        <div class="card-actions" id="userinfo">
+          <div id="button-container">
+          <paper-button raised class="button" id="savechanges-button"  on-tap="savechanges">Зберегти зміни</paper-button>
           </div>
         </div>
       </paper-card>
@@ -54,7 +73,33 @@
 </template>
 <script>
 Polymer({
-  is: 'hromada-settings'
+  is: 'hromada-settings',
+  properties: {
+    user: {
+      type: Object
+    }
+  },
+  savechanges: function() {
+    let ref = this.$.userdata;
+    let obj = {lastChange: new Date()};
+    console.log(this.$.name.value);
+    if(this.$.password.value == ""){
+      obj.name = this.$.name.value;
+      if(this.$.email.value != this.user.email){
+        //TODO change firebase account email as well
+        obj.email = this.$.email.value;
+      }
+    }else{
+      if(this.$.password.value != this.$.passwordconf.value){
+        this.$.passwordconf.error = "Паролі не збігаються";
+      }else{
+        //TODO password change firebase
+      }
+    }
+    console.log(obj);
+    this.$.usr.ref.child(this.user.uid).update(obj);
+    console.log("Updated the profile successfully");
+  }
 });
 </script>
 </dom-module>
