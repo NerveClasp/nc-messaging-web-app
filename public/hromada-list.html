@@ -73,18 +73,23 @@
     path="/users/[[user.uid]]"
     data="{{userdata}}">
   </firebase-document>
+  <firebase-document
+    id="hromada"
+    path="/location/hromada/[[userdata.locationNum]]"
+    data="{{hromada}}">
+  </firebase-document>
   <firebase-query
     id="shouts"
     limit-to-first={{limitToFirst}}
     order-by-child="order"
-    path="/shout/[[userdata.location]]"
+    path="/shout/[[userdata.locationNum]]"
     data={{shouts}}>
   </firebase-query>
 
   <div id="shouts" class="layout vertical">
     <div class="list-container">
       <paper-card id="name" class="pcard">
-        <div class="shout-text" id="name"><h1>[[userdata.location]]</h1></div>
+        <div class="shout-text" id="name"><h1>[[hromada]]</h1></div>
       </paper-card>
     </div>
     <template is="dom-repeat" items="[[shouts]]" as="shout">

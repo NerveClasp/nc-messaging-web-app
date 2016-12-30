@@ -120,12 +120,12 @@
           error-message="Паролі не збігаються">
         </paper-password-input>
         <paper-input id="name" required label="Ім'я" class="textleft"></paper-input>
-        <!-- <paper-dropdown-menu label="Громада" selected={{value}}>
+        <!-- <paper-dropdown-menu id="hromada" label="Громада" selected={{value}}>
           <paper-listbox class="dropdown-content">
-            <paper-item selected="0">Львів</paper-item>
-            <paper-item selected="1">Луцьк</paper-item>
-            <paper-item selected="2">Білогір'я</paper-item>
-            <paper-item selected="3">Київ</paper-item>
+            <paper-item selected="0" value="Львів">Львів</paper-item>
+            <paper-item selected="1" value="Луцьк">Луцьк</paper-item>
+            <paper-item selected="2" value="Білогір'я">Білогір'я</paper-item>
+            <paper-item selected="3" value="Київ">Київ</paper-item>
           </paper-listbox>
         </paper-dropdown-menu> -->
         <paper-button raised on-tap="signup">Зареєструватись</paper-button>
@@ -188,22 +188,25 @@ Polymer({
     let displayError = this.displayError;
     let errormessage = this.$.errormessage;
     const ref = this.$.userdb.ref;
-    return this.$.auth.createUserWithEmailAndPassword(email, password)
-      .then(function(resp) {
-        let userDetails = {
-          email: resp.email,
-          name: name,
-          uid: resp.uid,
-          location: "Львів"
-        }
-        ref.child(resp.uid).set(userDetails);
-        console.log("Successfully added", resp.email, resp.uid);
-      })
-      .catch(function(err) {
-        console.log("signup error!", err.code, err.message);
-        displayError(errormessage, err.code, err.message);
-      });
-
+    if(name != ""){
+      return this.$.auth.createUserWithEmailAndPassword(email, password)
+        .then(function(resp) {
+          let userDetails = {
+            email: resp.email,
+            name: name,
+            uid: resp.uid,
+            location: "Львів"
+          }
+          ref.child(resp.uid).set(userDetails);
+          console.log("Successfully added", resp.email, resp.uid);
+        })
+        .catch(function(err) {
+          console.log("signup error!", err.code, err.message);
+          displayError(errormessage, err.code, err.message);
+        });
+    }else{
+      displayError(errormessage, "signup/empty-name", "Ім'я - обов'язкове поле. Усі обов'язкові :)")
+    }
   },
   logout: function() {
     return this.$.auth.signOut();

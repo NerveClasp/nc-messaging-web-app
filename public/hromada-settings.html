@@ -25,11 +25,16 @@
 }
 </style>
 <template>
-  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-auth id="auth" user="{{user}}"></firebase-auth>
   <firebase-document
     id="userdata"
     path="/users/[[user.uid]]"
     data="{{userdata}}">
+  </firebase-document>
+  <firebase-document
+    id="location"
+    path="/location/hromada"
+    data="{{location}}">
   </firebase-document>
   <firebase-query
     id="usr"
@@ -60,11 +65,22 @@
               auto-validate validator="match-passwords-validator"
     					error-message="Паролі не збігаються">
               </paper-password-input>
+              <paper-dropdown-menu label="Громада" class="shout-text">
+                <paper-listbox class="dropdown-content"
+                  selected="{{userdata.locationNum}}">
+                  <paper-item selected="0">[[location.0]]</paper-item>
+                  <paper-item selected="1">[[location.1]]</paper-item>
+                  <paper-item selected="2">[[location.2]]</paper-item>
+                  <paper-item selected="3">[[location.3]]</paper-item>
+                  <paper-item selected="4">[[location.4]]</paper-item>          
+                </paper-listbox>
+              </paper-dropdown-menu>
           </div>
         </div>
         <div class="card-actions" id="userinfo">
           <div id="button-container">
-          <paper-button raised class="button" id="savechanges-button"  on-tap="savechanges">Зберегти зміни</paper-button>
+          <paper-button raised class="button" id="savechanges-button"
+            on-tap="savechanges">Зберегти зміни</paper-button>
           </div>
         </div>
       </paper-card>
@@ -82,23 +98,35 @@ Polymer({
   savechanges: function() {
     let ref = this.$.userdata;
     let obj = {lastChange: new Date()};
-    console.log(this.$.name.value);
+    let email = this.$.email.value;
+    console.log(this.user.email);
     if(this.$.password.value == ""){
       obj.name = this.$.name.value;
-      if(this.$.email.value != this.user.email){
+      if(email != this.user.email){
         //TODO change firebase account email as well
-        obj.email = this.$.email.value;
+        this.user.updateEmail(email).then(function() {
+          console.log("Email changed successfully");
+        }, function(error) {
+          this.$.email.label = error.message;
+          console.log(error);
+        });
+        obj.email = email;
       }
     }else{
       if(this.$.password.value != this.$.passwordconf.value){
         this.$.passwordconf.error = "Паролі не збігаються";
       }else{
-        //TODO password change firebase
+        this.user.updatePassword(this.$.password.value).then(function() {
+          console.log("password changed successfully");
+          // we need to log the user out as no other changes can be made with the old password
+          this.$.auth.signOut();
+        }, function(error) {
+          console.log("Password was not changed", error);
+        });
       }
     }
     console.log(obj);
     this.$.usr.ref.child(this.user.uid).update(obj);
-    console.log("Updated the profile successfully");
   }
 });
 </script>
