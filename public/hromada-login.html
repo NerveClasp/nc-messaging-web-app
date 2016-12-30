@@ -12,6 +12,9 @@
 <dom-module id="hromada-login" is="dom-bind">
 <template>
 <style>
+  :root {
+    --paper-tabs-selection-bar-color: #609bd1;
+  }
   .welcome-home{
     font-family: Junegull, monospace;
     border-radius: 50%;
@@ -60,6 +63,11 @@
   .textleft{
     text-align: left;
   }
+  .loginsignup{
+    width: 100%;
+    padding: 24px;
+    background-color: #F2F9FF;
+  }
   #errormessage{
     display: block;
     background-color: red;
@@ -95,40 +103,44 @@
     </paper-tabs>
     <iron-pages selected={{selected}}>
       <div>
-        <gold-email-input id="emailL" label="Імейл" auto-validate class="textleft"
-          validator="email-validator" required error-message="Не схоже на імейл">
-        </gold-email-input>
-        <paper-password-input
-          id="passwordL" label="Пароль" class="textleft"
-          auto-validate validator="min-length-validator"
-					error-message="Пароль має бути мінімум 6 символів">
-        </paper-password-input>
-        <paper-button raised on-tap="login">Зайти</paper-button>
+        <paper-card class="loginsignup">
+          <gold-email-input id="emailL" label="Імейл" auto-validate class="textleft"
+            validator="email-validator" required error-message="Не схоже на імейл">
+          </gold-email-input>
+          <paper-password-input
+            id="passwordL" label="Пароль" class="textleft"
+            auto-validate validator="min-length-validator"
+  					error-message="Пароль має бути мінімум 6 символів">
+          </paper-password-input>
+          <paper-button raised on-tap="login">Зайти</paper-button>
+        </paper-card>
       </div>
       <div>
-        <gold-email-input id="emailS" label="Імейл" auto-validate  class="textleft"
-          validator="email-validator" required error-message="Не схоже на імейл">
-        </gold-email-input>
-        <paper-password-input
-          id="passwordS" value={{passwordinput}} label="Пароль" class="textleft"
-          auto-validate validator="min-length-validator"
-					error-message="Пароль має бути мінімум 6 символів">
-        </paper-password-input>
-        <paper-password-input
-          id="passwordSconf" label="Повторити пароль" class="textleft"
-          auto-validate validator="match-passwords-validator"
-          error-message="Паролі не збігаються">
-        </paper-password-input>
-        <paper-input id="name" required label="Ім'я" class="textleft"></paper-input>
-        <!-- <paper-dropdown-menu id="hromada" label="Громада" selected={{value}}>
-          <paper-listbox class="dropdown-content">
-            <paper-item selected="0" value="Львів">Львів</paper-item>
-            <paper-item selected="1" value="Луцьк">Луцьк</paper-item>
-            <paper-item selected="2" value="Білогір'я">Білогір'я</paper-item>
-            <paper-item selected="3" value="Київ">Київ</paper-item>
-          </paper-listbox>
-        </paper-dropdown-menu> -->
-        <paper-button raised on-tap="signup">Зареєструватись</paper-button>
+        <paper-card class="loginsignup">
+          <gold-email-input id="emailS" label="Імейл" auto-validate  class="textleft"
+            validator="email-validator" required error-message="Не схоже на імейл">
+          </gold-email-input>
+          <paper-password-input
+            id="passwordS" value={{passwordinput}} label="Пароль" class="textleft"
+            auto-validate validator="min-length-validator"
+  					error-message="Пароль має бути мінімум 6 символів">
+          </paper-password-input>
+          <paper-password-input
+            id="passwordSconf" label="Повторити пароль" class="textleft"
+            auto-validate validator="match-passwords-validator"
+            error-message="Паролі не збігаються">
+          </paper-password-input>
+          <paper-input id="name" required label="Ім'я" class="textleft"></paper-input>
+          <!-- <paper-dropdown-menu id="hromada" label="Громада" selected={{value}}>
+            <paper-listbox class="dropdown-content">
+              <paper-item selected="0" value="Львів">Львів</paper-item>
+              <paper-item selected="1" value="Луцьк">Луцьк</paper-item>
+              <paper-item selected="2" value="Білогір'я">Білогір'я</paper-item>
+              <paper-item selected="3" value="Київ">Київ</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu> -->
+          <paper-button raised on-tap="signup">Зареєструватись</paper-button>
+        </paper-card>
       </div>
     </iron-pages>
   </div>
@@ -195,7 +207,7 @@ Polymer({
             email: resp.email,
             name: name,
             uid: resp.uid,
-            location: "Львів"
+            locationNum: 0
           }
           ref.child(resp.uid).set(userDetails);
           console.log("Successfully added", resp.email, resp.uid);

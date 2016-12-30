@@ -73,5 +73,7 @@ h1{
   background-color: white;
 }
 paper-tabs{
-  background-color: #F2F9FF;
+  color: #3d3d3d;
+  background-color: #9ed2ff;
+  selection-bar-color: #609bd1;
 }

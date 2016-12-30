@@ -7,6 +7,9 @@
 <dom-module id="hromada-app">
   <template>
     <style>
+      :root {
+        --paper-tabs-selection-bar-color: yellow;
+      }
       h1{
         display: block;
         font-family: Junegull, monospace;
@@ -57,7 +60,7 @@
         },
         selected:{
           type: Number,
-          value: 1
+          value: 0
         }
       }
     });
